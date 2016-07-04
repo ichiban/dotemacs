@@ -26,6 +26,19 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+(dolist (package '(color-theme
+		   zenburn-theme
+		   rust-mode
+		   merlin
+		   go-mode
+		   go-errcheck
+		   auto-complete
+		   go-autocomplete))
+  (unless (package-installed-p package)
+    (package-install package)))
 
 ;; color-theme
 (require 'color-theme)
@@ -43,19 +56,25 @@
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
 ;; common lisp
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
+(setq slime-helper-file (expand-file-name "~/quicklisp/slime-helper.el"))
+(when (file-exists-p slime-helper-file)
+    (load slime-helper-file))
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 
 ;; OCaml
-(load "/Users/ichiban/.opam/system/share/emacs/site-lisp/tuareg-site-file")
-(add-to-list 'load-path "/Users/ichiban/.opam/system/share/emacs/site-lisp/")
-;; Add opam emacs directory to the load-path
-(setq opam-share
-      (substring
-       (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
-(add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+(setq tuareg-site-file
+      "~/.opam/system/share/emacs/site-lisp/tuareg-site-file")
+(when (file-exists-p tuareg-site-file)
+  (load tuareg-site-file))
+(when (file-exists-p "~/.opam")
+  (add-to-list 'load-path "~/.opam/system/share/emacs/site-lisp/")
+  ;; Add opam emacs directory to the load-path
+  (setq opam-share
+	(substring
+	 (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
+  (add-to-list 'load-path (concat opam-share "/emacs/site-lisp")))
 ;; Load merlin-mode
 (require 'merlin)
 ;; Start merlin on ocaml files
@@ -69,7 +88,6 @@
 (setq tuareg-indent-align-with-first-arg nil)
 (put 'upcase-region 'disabled nil)
 
-
 ;; Golang
 (require 'go-mode)
 ;; go-errcheck
@@ -78,7 +96,3 @@
 (require 'go-autocomplete)
 (require 'auto-complete-config)
 (ac-config-default)
-;; oracle
-(defun my-go-mode-hook ()
-  (load-file "/ssh:relax:$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el"))
-(add-hook 'go-mode-hook 'my-go-mode-hook)

@@ -31,12 +31,16 @@
 
 (dolist (package '(color-theme
 		   zenburn-theme
+		   auto-complete
+		   direx
+		   flycheck
 		   rust-mode
 		   merlin
 		   go-mode
 		   go-errcheck
-		   auto-complete
-		   go-autocomplete))
+		   go-autocomplete
+		   go-eldoc
+		   go-direx))
   (unless (package-installed-p package)
     (package-install package)))
 
@@ -96,3 +100,20 @@
 (require 'go-autocomplete)
 (require 'auto-complete-config)
 (ac-config-default)
+;; go-eldoc
+(require 'go-eldoc)
+(add-hook 'go-mode-hook 'go-eldoc-setup)
+;; go-direx
+(require 'go-direx)
+(define-key go-mode-map (kbd "C-c C-j") 'go-direx-pop-to-buffer)
+;; go-guru
+(defvar go-guru-file
+  (substitute-in-file-name
+   "$GOPATH/src/golang.org/x/tools/cmd/guru/go-guru.el"))
+(when (file-exists-p go-guru-file)
+  (load go-guru-file)
+  (add-hook 'go-mode-hook 'go-guru-mode))
+
+;; Flycheck
+(require 'flycheck)
+(global-flycheck-mode)

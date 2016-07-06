@@ -32,15 +32,13 @@
 (dolist (package '(color-theme
 		   zenburn-theme
 		   auto-complete
-		   direx
 		   flycheck
 		   rust-mode
 		   merlin
 		   go-mode
 		   go-errcheck
 		   go-autocomplete
-		   go-eldoc
-		   go-direx))
+		   go-eldoc))
   (unless (package-installed-p package)
     (package-install package)))
 
@@ -103,9 +101,6 @@
 ;; go-eldoc
 (require 'go-eldoc)
 (add-hook 'go-mode-hook 'go-eldoc-setup)
-;; go-direx
-(require 'go-direx)
-(define-key go-mode-map (kbd "C-c C-j") 'go-direx-pop-to-buffer)
 ;; go-guru
 (defvar go-guru-file
   (substitute-in-file-name

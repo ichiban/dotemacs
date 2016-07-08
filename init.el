@@ -38,7 +38,8 @@
 		   go-mode
 		   go-errcheck
 		   go-autocomplete
-		   go-eldoc))
+		   go-eldoc
+		   gotest))
   (unless (package-installed-p package)
     (package-install package)))
 
@@ -92,6 +93,7 @@
 
 ;; Golang
 (require 'go-mode)
+(add-hook 'before-save-hook 'gofmt-before-save)
 ;; go-errcheck
 (require 'go-errcheck)
 ;; gocode
@@ -108,6 +110,18 @@
 (when (file-exists-p go-guru-file)
   (load go-guru-file)
   (add-hook 'go-mode-hook 'go-guru-mode))
+;; gotest
+(require 'gotest)
+(defun my-go-mode-hook-for-go-test ()
+  (define-key go-mode-map (kbd "C-x f") 'go-test-current-file)
+  (define-key go-mode-map (kbd "C-x t") 'go-test-current-test)
+  (define-key go-mode-map (kbd "C-x p") 'go-test-current-project)
+  (define-key go-mode-map (kbd "C-x x") 'go-run)
+  (dolist (elt go-test-compilation-error-regexp-alist-alist)
+    (add-to-list 'compilation-error-regexp-alist-alist elt))
+  (dolist (elt (reverse go-test-compilation-error-regexp-alist))
+    (add-to-list 'compilation-error-regexp-alist elt t)))
+(add-hook 'go-mode-hook 'my-go-mode-hook-for-go-test)
 
 ;; Flycheck
 (require 'flycheck)
